@@ -1,0 +1,52 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #17212b;
+  background: #f5f7fa;
+  line-height: 1.5;
+
+  --primary: #0f69ab;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 70rem;
+  margin-inline: auto;
+  padding: 2rem 1rem;
+}
+
+.feature-nav {
+  display: grid;
+  gap: 1rem;
+}
+
+.feature-link {
+  padding: 1rem;
+  border-radius: 0.3rem;
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.feature-link:hover {
+  background: #0b5287;
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+  .feature-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
