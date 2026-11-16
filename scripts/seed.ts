@@ -2,6 +2,8 @@ import { MongoClient } from "mongodb"
 import { credentialsSchema } from "../shared/credentials.ts"
 import { hashPassword } from "../server/utils/password.ts"
 import type { UserRecord } from "../server/types/user.ts"
+import type { EmployeeRecord } from "../server/types/employee.ts"
+import { seedDemoEmployees } from "./demo-employees.ts"
 
 async function seedUser() {
   const mongoUrl = process.env.NUXT_MONGO_URL
@@ -73,6 +75,21 @@ async function seedUser() {
     } else {
       console.log("User already exists. Password was not changed.")
     }
+
+    const user = await users.findOne({
+      username: credentials.username,
+    })
+
+    if (!user) {
+      throw new Error("Seed user was not found")
+    }
+
+    const demoResult = await seedDemoEmployees(
+      db.collection<EmployeeRecord>("employees"),
+      user._id.toHexString(),
+    )
+
+    console.log(`Created ${demoResult.upsertedCount} demo employees`)
   } finally {
     await client.close()
   }
