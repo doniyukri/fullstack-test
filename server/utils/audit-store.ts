@@ -16,10 +16,11 @@ export async function saveWithAudit<T>(
   save: (session: ClientSession) => Promise<{ result: T; changes: ActivityChange[] }>,
 ): Promise<T> {
   return client.withSession(async (session) => {
+    // If saving the data or history fails, MongoDB rolls back both writes
     const result = await session.withTransaction(async () => {
       const saved = await save(session)
 
-      // Save the data and activity in one transaction
+      // Do not add history when the values did not change
       if (saved.changes.length > 0) {
         const id = randomUUID()
         await outbox.insertOne(

@@ -56,6 +56,7 @@ export async function requireUser(event: H3Event) {
 
   const db = await getDatabase()
 
+  // Check expiry here because MongoDB may remove expired records a little later
   const session = await db.collection<SessionRecord>('sessions').findOne({
     _id: hashSessionToken(token),
     expiresAt: { $gt: new Date() },

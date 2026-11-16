@@ -72,6 +72,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
     version.value = result.version
     savedAmount.value = input.amount
 
+    // Load the wording from the API after the save succeeds
     await refresh()
 
     if (error.value) {

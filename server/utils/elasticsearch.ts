@@ -49,6 +49,7 @@ async function ensureIndex() {
 }
 
 export function syncActivity(userId?: string): Promise<void> {
+  // A Home request waits for any current sync, then checks this user's pending records
   if (syncing) return userId ? syncing.then(() => syncActivity(userId)) : syncing
   syncing = (async () => {
     await ensureIndex()
@@ -62,6 +63,7 @@ export function syncActivity(userId?: string): Promise<void> {
     if (pending.length === 0) return
     const index = useRuntimeConfig().elasticsearchIndex
 
+    // Reuse the activity ID so sending the same record again does not create a copy
     const lines =
       pending
         .flatMap(({ _id, indexedAt, ...activity }) => [
@@ -79,6 +81,7 @@ export function syncActivity(userId?: string): Promise<void> {
     const result = await response.json()
     if (!response.ok || result.errors) throw new Error('Activity sync failed')
 
+    // Mark records as sent only after Elasticsearch accepts the whole batch
     await outbox.updateMany(
       { _id: { $in: pending.map((item) => item._id) } },
       { $set: { indexedAt: new Date() } },

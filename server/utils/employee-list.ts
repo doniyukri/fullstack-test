@@ -40,7 +40,7 @@ function dateYearsAgo(today: string, years: number): string {
 
   date.setUTCFullYear(date.getUTCFullYear() - years)
 
-  // Clamp February 29 to February 28 when needed
+  // Use February 28 if that year has no February 29
   if (date.getUTCMonth() !== month) {
     date.setUTCDate(0)
   }
@@ -53,6 +53,7 @@ export function buildEmployeeFilter(
   query: EmployeeListQuery,
   today: string,
 ): Filter<EmployeeRecord> {
+  // Keep the owner check when adding any search or filter conditions
   const conditions: Filter<EmployeeRecord>[] = [{ userId }]
 
   for (const field of ['gradeId', 'provinceId', 'cityId', 'districtId'] as const) {
@@ -62,6 +63,7 @@ export function buildEmployeeFilter(
   }
 
   if (query.search) {
+    // Treat symbols like .* as normal search text
     const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
     conditions.push({
@@ -82,6 +84,7 @@ export function buildEmployeeFilter(
   }
 
   if (query.maxAge !== undefined) {
+    // Age 30 includes birthdays after the date 31 years ago
     birthDate.$gt = dateYearsAgo(today, query.maxAge + 1)
   }
 
@@ -90,6 +93,7 @@ export function buildEmployeeFilter(
   }
 
   if (query.cursor) {
+    // Use the ID to break ties when records have the same creation time
     const cursor = decodeEmployeeCursor(query.cursor)
     const createdAt = new Date(cursor.createdAt)
 
@@ -115,6 +119,7 @@ export async function listEmployees(
 ) {
   const filter = buildEmployeeFilter(userId, query, today)
 
+  // Read one extra record to check whether another page is available
   const records = await collection
     .find(filter)
     .project({

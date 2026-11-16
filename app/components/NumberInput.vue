@@ -34,6 +34,7 @@ function update(event: Event) {
   input.value = format(normalized)
   invalid.value = ''
   input.setCustomValidity('')
+  // Count digits to put the cursor back after adding commas
   let position = 0
   let passed = 0
   while (position < input.value.length && passed < before) {

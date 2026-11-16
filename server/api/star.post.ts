@@ -53,6 +53,7 @@ export default defineEventHandler(async (event) => {
     const unchanged = current !== null && current.count === count && current.type === type
 
     if (unchanged) {
+      // Only repeated Submit gets the wait message; unchanged Save does not write again
       const elapsedMs = now.getTime() - current.updatedAt.getTime()
 
       if (action === 'submit' && elapsedMs < duplicateWindowMs) {

@@ -28,6 +28,7 @@ export async function recordAttempt(
 ) {
   const window = getWindow(key, windowMs, now)
 
+  // Let MongoDB increase the count so requests arriving together are not lost
   const record = await collection.findOneAndUpdate(
     { _id: window.id },
     {

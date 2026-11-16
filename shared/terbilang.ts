@@ -60,6 +60,7 @@ export function spellUnderThousand(value: number): string {
     return prefix
   }
 
+  // Spell the part after the hundreds, such as 25 in 325
   return prefix + ' ' + spellUnderThousand(remainder)
 }
 
@@ -80,20 +81,24 @@ export function terbilang(raw: string): string {
   let unitIndex = 0
 
   while (remaining > 0n) {
+    // Read three digits at a time, starting from the right
     const groupValue = Number(remaining % 1000n)
 
     if (groupValue > 0) {
       let groupWords = spellUnderThousand(groupValue)
 
       if (unitIndex === 1 && groupValue === 1) {
+        // Use seribu instead of satu ribu
         groupWords = 'seribu'
       } else if (unitIndex > 0) {
         groupWords += ' ' + unitNames[unitIndex]!
       }
 
+      // Put larger groups first because we read the number from the right
       groups.unshift(groupWords)
     }
 
+    // BigInt division removes the remainder before reading the next group
     remaining = remaining / 1000n
     unitIndex++
   }

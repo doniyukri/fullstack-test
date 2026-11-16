@@ -100,6 +100,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
     version.value = result.version
     savedInput.value = input
 
+    // Load the output from the API after the save succeeds
     await refresh()
 
     if (error.value) {

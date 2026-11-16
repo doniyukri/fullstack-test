@@ -23,6 +23,7 @@ export function useCursorList<T>(
     controller = new AbortController()
     try {
       const page = await fetchPage(cursor.value, controller.signal)
+      // Ignore an old response if the search or filters changed while it was loading
       if (current !== generation) return
       items.value = [...items.value, ...page.items]
       cursor.value = page.nextCursor ?? undefined
@@ -38,6 +39,7 @@ export function useCursorList<T>(
   }
 
   function reset() {
+    // Stop the previous request and start again from the first page
     generation += 1
     controller?.abort()
     items.value = []
