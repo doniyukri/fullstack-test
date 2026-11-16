@@ -3,4 +3,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
+  runtimeConfig: {
+    mongoUrl: "",
+    mongoDatabase: "electronic_city_submission",
+    siteOrigin: "http://localhost:3001",
+  },
 })

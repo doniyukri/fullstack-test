@@ -1,0 +1,17 @@
+name: electronic-city-submission
+
+services:
+  mongo:
+    image: mongo:8.0
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mongo-data:
