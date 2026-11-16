@@ -5,6 +5,11 @@ export const starInputSchema = z.strictObject({
   type: z.union([z.literal(1), z.literal(2), z.literal(3)]),
 })
 
+export const starSaveSchema = starInputSchema.extend({
+  action: z.enum(["submit", "save"]),
+  version: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+})
+
 export const terbilangInputSchema = z.strictObject({
   amount: z
     .string()
