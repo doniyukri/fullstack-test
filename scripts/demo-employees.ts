@@ -1,30 +1,38 @@
-import { createHash } from "node:crypto"
-import { ObjectId } from "mongodb"
-import type { Collection, WithId } from "mongodb"
-import { employeeGrades } from "../server/config/employee-grades.ts"
-import type { EmployeeRecord } from "../server/types/employee.ts"
+import { createHash } from 'node:crypto'
+import { ObjectId } from 'mongodb'
+import type { Collection, WithId } from 'mongodb'
+import { employeeGrades } from '../server/config/employee-grades.ts'
+import type { EmployeeRecord } from '../server/types/employee.ts'
 
 const names = [
-  "Rina Putri",
-  "Andi Saputra",
-  "Siti Rahma",
-  "Budi Santoso",
-  "Dewi Lestari",
-  "Rizky Pratama",
-  "Maya Sari",
-  "Fajar Hidayat",
-  "Nadia Putri",
-  "Dimas Setiawan",
-  "Laras Wulandari",
-  "Indra Wijaya",
-  "Farah Aulia",
-  "Dewi Anggraini",
-  "Anisa Putri",
-  "Agus Firmansyah", "Novi Handayani", "Yoga Prasetyo", "Putri Amelia", "Hendra Gunawan",
-  "Intan Permata", "Arif Maulana", "Nina Kartika", "Bayu Nugroho", "Ratna Dewi",
+  'Rina Putri',
+  'Andi Saputra',
+  'Siti Rahma',
+  'Budi Santoso',
+  'Dewi Lestari',
+  'Rizky Pratama',
+  'Maya Sari',
+  'Fajar Hidayat',
+  'Nadia Putri',
+  'Dimas Setiawan',
+  'Laras Wulandari',
+  'Indra Wijaya',
+  'Farah Aulia',
+  'Dewi Anggraini',
+  'Anisa Putri',
+  'Agus Firmansyah',
+  'Novi Handayani',
+  'Yoga Prasetyo',
+  'Putri Amelia',
+  'Hendra Gunawan',
+  'Intan Permata',
+  'Arif Maulana',
+  'Nina Kartika',
+  'Bayu Nugroho',
+  'Ratna Dewi',
 ]
 
-const positions = ["Staff Admin", "Supervisor", "Manager"]
+const positions = ['Staff Admin', 'Supervisor', 'Manager']
 
 export function buildDemoEmployees(
   userId: string,
@@ -40,9 +48,9 @@ export function buildDemoEmployees(
         : Math.floor((grade.minSalary + grade.maxSalary) / 2)
 
     // Use the same ID when seeding the same demo record again
-    const id = createHash("sha256")
+    const id = createHash('sha256')
       .update(`demo-employee-v1:${userId}:${index}`)
-      .digest("hex")
+      .digest('hex')
       .slice(0, 24)
 
     return {
@@ -55,12 +63,12 @@ export function buildDemoEmployees(
       birthDate: `${1978 + index}-05-12`,
       baseSalary,
       address: `Jalan Contoh ${index + 1}`,
-      provinceId: "31",
-      provinceName: "Daerah Khusus Ibukota Jakarta",
-      cityId: "31.71",
-      cityName: "Kota Administrasi Jakarta Pusat",
-      districtId: "31.71.01",
-      districtName: "Gambir",
+      provinceId: '31',
+      provinceName: 'Daerah Khusus Ibukota Jakarta',
+      cityId: '31.71',
+      cityName: 'Kota Administrasi Jakarta Pusat',
+      districtId: '31.71.01',
+      districtName: 'Gambir',
       createdAt: new Date(now.getTime() - index * 60_000),
     }
   })

@@ -1,6 +1,6 @@
-import { cityIdSchema } from "#shared/regions"
-import { getDistricts } from "../../utils/regions.ts"
-import { requireUser } from "../../utils/session.ts"
+import { cityIdSchema } from '#shared/regions'
+import { getDistricts } from '../../utils/regions.ts'
+import { requireUser } from '../../utils/session.ts'
 
 export default defineEventHandler(async (event) => {
   await requireUser(event)
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Pilih kabupaten atau kota yang valid",
+      statusMessage: 'Pilih kabupaten atau kota yang valid',
     })
   }
 

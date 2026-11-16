@@ -1,17 +1,14 @@
-import test from "node:test"
-import assert from "node:assert/strict"
-import {
-  generateSessionToken,
-  hashSessionToken,
-} from "../server/utils/session.ts"
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { generateSessionToken, hashSessionToken } from '../server/utils/session.ts'
 
-test("session token has 64 hex characters", () => {
+test('session token has 64 hex characters', () => {
   const token = generateSessionToken()
 
   assert.match(token, /^[a-f0-9]{64}$/)
 })
 
-test("same token gives the same hash", () => {
+test('same token gives the same hash', () => {
   const token = generateSessionToken()
   const hash = hashSessionToken(token)
 
@@ -20,6 +17,6 @@ test("same token gives the same hash", () => {
   assert.notEqual(hash, token)
 })
 
-test("new session tokens are different", () => {
+test('new session tokens are different', () => {
   assert.notEqual(generateSessionToken(), generateSessionToken())
 })

@@ -30,9 +30,14 @@ async function seedReviewers() {
       const username = `reviewer${index}`
       // These accounts are only for reviewing the demo
       const passwordHash = await hashPassword('testting123456')
-      await db.collection('users').updateOne({ username }, {
-        $set: { passwordHash }, $setOnInsert: { createdAt: new Date() },
-      }, { upsert: true })
+      await db.collection('users').updateOne(
+        { username },
+        {
+          $set: { passwordHash },
+          $setOnInsert: { createdAt: new Date() },
+        },
+        { upsert: true },
+      )
       console.log(`Ready: ${username}`)
     }
 
@@ -41,29 +46,62 @@ async function seedReviewers() {
     const userId = user._id.toHexString()
     const now = new Date()
     await seedDemoEmployees(db.collection<EmployeeRecord>('employees'), userId, now, 25)
-    await db.collection<StarRecord>('star_states').updateOne({ _id: userId }, {
-      $setOnInsert: { count: 5, type: 3, version: 1, createdAt: now, updatedAt: now },
-    }, { upsert: true })
-    await db.collection<TerbilangRecord>('terbilang_states').updateOne({ _id: userId }, {
-      $setOnInsert: { amount: '1375', version: 1, createdAt: now, updatedAt: now },
-    }, { upsert: true })
+    await db.collection<StarRecord>('star_states').updateOne(
+      { _id: userId },
+      {
+        $setOnInsert: { count: 5, type: 3, version: 1, createdAt: now, updatedAt: now },
+      },
+      { upsert: true },
+    )
+    await db.collection<TerbilangRecord>('terbilang_states').updateOne(
+      { _id: userId },
+      {
+        $setOnInsert: { amount: '1375', version: 1, createdAt: now, updatedAt: now },
+      },
+      { upsert: true },
+    )
 
     const examples = [
-      { key: 'star', module: 'STAR', changes: [{ field: 'Jumlah bintang', before: null, after: 5 }, { field: 'Tipe susunan', before: null, after: 3 }], createdAt: now.toISOString() },
-      { key: 'terbilang', module: 'Terbilang', changes: [{ field: 'Nominal', before: null, after: '1375' }], createdAt: now.toISOString() },
+      {
+        key: 'star',
+        module: 'STAR',
+        changes: [
+          { field: 'Jumlah bintang', before: null, after: 5 },
+          { field: 'Tipe susunan', before: null, after: 3 },
+        ],
+        createdAt: now.toISOString(),
+      },
+      {
+        key: 'terbilang',
+        module: 'Terbilang',
+        changes: [{ field: 'Nominal', before: null, after: '1375' }],
+        createdAt: now.toISOString(),
+      },
       ...buildDemoEmployees(userId, now, 25).map((employee) => ({
-        key: employee._id.toHexString(), module: 'Form Karyawan',
-        changes: [{ field: 'Nama', before: null, after: employee.name }], createdAt: employee.createdAt.toISOString(),
+        key: employee._id.toHexString(),
+        module: 'Form Karyawan',
+        changes: [{ field: 'Nama', before: null, after: employee.name }],
+        createdAt: employee.createdAt.toISOString(),
       })),
     ]
     for (const example of examples) {
       const id = activityId(`${userId}:${example.key}`)
-      await db.collection<{ _id: string }>('activity_outbox').updateOne({ _id: id }, {
-        $setOnInsert: {
-          id, userId, username: 'reviewer1', module: example.module,
-          action: 'save', createdAt: example.createdAt, changes: example.changes, demo: true,
+      await db.collection<{ _id: string }>('activity_outbox').updateOne(
+        { _id: id },
+        {
+          $setOnInsert: {
+            id,
+            userId,
+            username: 'reviewer1',
+            module: example.module,
+            action: 'save',
+            createdAt: example.createdAt,
+            changes: example.changes,
+            demo: true,
+          },
         },
-      }, { upsert: true })
+        { upsert: true },
+      )
     }
     console.log('Reviewer1 has STAR, Terbilang, and 25 demo employees')
   } finally {

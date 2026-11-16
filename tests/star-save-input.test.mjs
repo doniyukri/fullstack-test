@@ -1,9 +1,9 @@
-import assert from "node:assert/strict"
-import test from "node:test"
-import { starSaveSchema } from "../shared/calculator-inputs.ts"
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { starSaveSchema } from '../shared/calculator-inputs.ts'
 
-test("STAR save accepts both actions", () => {
-  for (const action of ["submit", "save"]) {
+test('STAR save accepts both actions', () => {
+  for (const action of ['submit', 'save']) {
     const result = starSaveSchema.safeParse({
       count: 4,
       type: 3,
@@ -15,19 +15,19 @@ test("STAR save accepts both actions", () => {
   }
 })
 
-test("STAR save rejects an invalid action or version", () => {
+test('STAR save rejects an invalid action or version', () => {
   const valid = {
     count: 4,
     type: 3,
-    action: "submit",
+    action: 'submit',
     version: 0,
   }
 
   const invalidInputs = [
-    { ...valid, action: "delete" },
+    { ...valid, action: 'delete' },
     { ...valid, version: -1 },
     { ...valid, version: 1.5 },
-    { ...valid, version: "0" },
+    { ...valid, version: '0' },
   ]
 
   for (const input of invalidInputs) {
@@ -35,13 +35,13 @@ test("STAR save rejects an invalid action or version", () => {
   }
 })
 
-test("STAR save rejects a user ID supplied by the client", () => {
+test('STAR save rejects a user ID supplied by the client', () => {
   const result = starSaveSchema.safeParse({
     count: 4,
     type: 3,
-    action: "submit",
+    action: 'submit',
     version: 0,
-    userId: "another-user",
+    userId: 'another-user',
   })
 
   assert.equal(result.success, false)

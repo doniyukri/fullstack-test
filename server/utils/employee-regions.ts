@@ -1,5 +1,5 @@
-import type { EmployeeInput } from "../../shared/employee.ts"
-import type { Region } from "../../shared/regions.ts"
+import type { EmployeeInput } from '../../shared/employee.ts'
+import type { Region } from '../../shared/regions.ts'
 
 interface RegionSource {
   getProvinces: () => Promise<Region[]>
@@ -7,23 +7,17 @@ interface RegionSource {
   getDistricts: (cityId: string) => Promise<Region[]>
 }
 
-type RegionSelection = Pick<
-  EmployeeInput,
-  "provinceId" | "cityId" | "districtId"
->
+type RegionSelection = Pick<EmployeeInput, 'provinceId' | 'cityId' | 'districtId'>
 
-export async function resolveEmployeeRegions(
-  selection: RegionSelection,
-  source: RegionSource,
-) {
+export async function resolveEmployeeRegions(selection: RegionSelection, source: RegionSource) {
   const provinces = await source.getProvinces()
   const province = provinces.find((item) => item.id === selection.provinceId)
 
   if (!province) {
     return {
       success: false as const,
-      field: "provinceId",
-      message: "Provinsi tidak tersedia",
+      field: 'provinceId',
+      message: 'Provinsi tidak tersedia',
     }
   }
 
@@ -33,8 +27,8 @@ export async function resolveEmployeeRegions(
   if (!city) {
     return {
       success: false as const,
-      field: "cityId",
-      message: "Kabupaten atau kota tidak sesuai dengan provinsi",
+      field: 'cityId',
+      message: 'Kabupaten atau kota tidak sesuai dengan provinsi',
     }
   }
 
@@ -44,8 +38,8 @@ export async function resolveEmployeeRegions(
   if (!district) {
     return {
       success: false as const,
-      field: "districtId",
-      message: "Kecamatan tidak sesuai dengan kabupaten atau kota",
+      field: 'districtId',
+      message: 'Kecamatan tidak sesuai dengan kabupaten atau kota',
     }
   }
 

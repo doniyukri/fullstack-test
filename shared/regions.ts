@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from 'zod'
 
 export const provinceIdSchema = z
   .string()
@@ -26,4 +26,4 @@ export const regionListSchema = z.object({
     .min(1),
 })
 
-export type Region = z.infer<typeof regionListSchema>["data"][number]
+export type Region = z.infer<typeof regionListSchema>['data'][number]

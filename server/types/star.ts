@@ -1,4 +1,4 @@
-import type { StarType } from "../../shared/star.ts"
+import type { StarType } from '../../shared/star.ts'
 
 export interface StarRecord {
   _id: string

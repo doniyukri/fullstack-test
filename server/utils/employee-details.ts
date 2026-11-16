@@ -1,6 +1,6 @@
-import { ObjectId } from "mongodb"
-import type { Collection } from "mongodb"
-import type { EmployeeRecord } from "../types/employee.ts"
+import { ObjectId } from 'mongodb'
+import type { Collection } from 'mongodb'
+import type { EmployeeRecord } from '../types/employee.ts'
 
 export async function getEmployeeDetails(
   collection: Collection<EmployeeRecord>,

@@ -1,4 +1,4 @@
-import type { EmployeeInput } from "../../shared/employee.ts"
+import type { EmployeeInput } from '../../shared/employee.ts'
 
 export interface EmployeeRecord extends EmployeeInput {
   userId: string

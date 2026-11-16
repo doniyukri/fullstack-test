@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb"
-import type { Collection, Filter } from "mongodb"
-import { z } from "zod"
-import type { EmployeeListQuery } from "../../shared/employee-list.ts"
-import type { EmployeeRecord } from "../types/employee.ts"
+import { ObjectId } from 'mongodb'
+import type { Collection, Filter } from 'mongodb'
+import { z } from 'zod'
+import type { EmployeeListQuery } from '../../shared/employee-list.ts'
+import type { EmployeeRecord } from '../types/employee.ts'
 
 const pageSize = 10
 
@@ -17,20 +17,20 @@ export function encodeEmployeeCursor(createdAt: Date, id: string) {
     id,
   })
 
-  return Buffer.from(value).toString("base64url")
+  return Buffer.from(value).toString('base64url')
 }
 
 export function decodeEmployeeCursor(value: string) {
   if (value.length > 256 || !/^[A-Za-z0-9_-]+$/.test(value)) {
-    throw new Error("Cursor tidak valid")
+    throw new Error('Cursor tidak valid')
   }
 
   try {
-    const json = Buffer.from(value, "base64url").toString("utf8")
+    const json = Buffer.from(value, 'base64url').toString('utf8')
 
     return cursorSchema.parse(JSON.parse(json))
   } catch {
-    throw new Error("Cursor tidak valid")
+    throw new Error('Cursor tidak valid')
   }
 }
 
@@ -55,24 +55,19 @@ export function buildEmployeeFilter(
 ): Filter<EmployeeRecord> {
   const conditions: Filter<EmployeeRecord>[] = [{ userId }]
 
-  for (const field of [
-    "gradeId",
-    "provinceId",
-    "cityId",
-    "districtId",
-  ] as const) {
+  for (const field of ['gradeId', 'provinceId', 'cityId', 'districtId'] as const) {
     if (query[field]) {
       conditions.push({ [field]: query[field] })
     }
   }
 
   if (query.search) {
-    const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
     conditions.push({
       $or: [
-        { name: { $regex: escaped, $options: "i" } },
-        { position: { $regex: escaped, $options: "i" } },
+        { name: { $regex: escaped, $options: 'i' } },
+        { position: { $regex: escaped, $options: 'i' } },
       ],
     })
   }
@@ -150,8 +145,6 @@ export async function listEmployees(
       createdAt: employee.createdAt,
     })),
     nextCursor:
-      hasMore && last
-        ? encodeEmployeeCursor(last.createdAt, last._id.toHexString())
-        : null,
+      hasMore && last ? encodeEmployeeCursor(last.createdAt, last._id.toHexString()) : null,
   }
 }

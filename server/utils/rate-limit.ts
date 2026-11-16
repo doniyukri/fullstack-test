@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto"
-import type { Collection } from "mongodb"
+import { createHash } from 'node:crypto'
+import type { Collection } from 'mongodb'
 
 export interface RateLimitRecord {
   _id: string
@@ -11,7 +11,7 @@ function getWindow(key: string, windowMs: number, now: number) {
   const windowStart = Math.floor(now / windowMs) * windowMs
   const windowEnd = windowStart + windowMs
 
-  const keyHash = createHash("sha256").update(key).digest("hex")
+  const keyHash = createHash('sha256').update(key).digest('hex')
 
   return {
     id: `${keyHash}:${windowStart}`,
@@ -36,13 +36,13 @@ export async function recordAttempt(
     },
     {
       upsert: true,
-      returnDocument: "after",
+      returnDocument: 'after',
       includeResultMetadata: false,
     },
   )
 
   if (!record) {
-    throw new Error("Could not update the rate limit.")
+    throw new Error('Could not update the rate limit.')
   }
 
   return {

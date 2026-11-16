@@ -1,16 +1,16 @@
-import { MongoClient } from "mongodb"
-import { credentialsSchema } from "../shared/credentials.ts"
-import { hashPassword } from "../server/utils/password.ts"
-import type { UserRecord } from "../server/types/user.ts"
-import type { EmployeeRecord } from "../server/types/employee.ts"
-import { seedDemoEmployees } from "./demo-employees.ts"
+import { MongoClient } from 'mongodb'
+import { credentialsSchema } from '../shared/credentials.ts'
+import { hashPassword } from '../server/utils/password.ts'
+import type { UserRecord } from '../server/types/user.ts'
+import type { EmployeeRecord } from '../server/types/employee.ts'
+import { seedDemoEmployees } from './demo-employees.ts'
 
 async function seedUser() {
   const mongoUrl = process.env.NUXT_MONGO_URL
   const databaseName = process.env.NUXT_MONGO_DATABASE
 
   if (!mongoUrl || !databaseName) {
-    console.error("Set NUXT_MONGO_URL and NUXT_MONGO_DATABASE.")
+    console.error('Set NUXT_MONGO_URL and NUXT_MONGO_DATABASE.')
     process.exitCode = 1
     return
   }
@@ -21,10 +21,10 @@ async function seedUser() {
   })
 
   if (!parsed.success) {
-    console.error("Check SEED_USERNAME and SEED_PASSWORD:")
+    console.error('Check SEED_USERNAME and SEED_PASSWORD:')
 
     for (const issue of parsed.error.issues) {
-      console.error(`- ${issue.path.join(".")}: ${issue.message}`)
+      console.error(`- ${issue.path.join('.')}: ${issue.message}`)
     }
 
     process.exitCode = 1
@@ -40,17 +40,15 @@ async function seedUser() {
     await client.connect()
 
     const db = client.db(databaseName)
-    const users = db.collection<UserRecord>("users")
+    const users = db.collection<UserRecord>('users')
 
     await users.createIndex({ username: 1 }, { unique: true })
 
-    for (const collectionName of ["sessions", "limits"]) {
-      await db
-        .collection(collectionName)
-        .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+    for (const collectionName of ['sessions', 'limits']) {
+      await db.collection(collectionName).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
     }
 
-    await db.collection("employees").createIndex({
+    await db.collection('employees').createIndex({
       userId: 1,
       createdAt: -1,
       _id: -1,
@@ -73,7 +71,7 @@ async function seedUser() {
     if (result.upsertedCount === 1) {
       console.log(`Created user: ${credentials.username}`)
     } else {
-      console.log("User already exists. Password was not changed.")
+      console.log('User already exists. Password was not changed.')
     }
 
     const user = await users.findOne({
@@ -81,11 +79,11 @@ async function seedUser() {
     })
 
     if (!user) {
-      throw new Error("Seed user was not found")
+      throw new Error('Seed user was not found')
     }
 
     const demoResult = await seedDemoEmployees(
-      db.collection<EmployeeRecord>("employees"),
+      db.collection<EmployeeRecord>('employees'),
       user._id.toHexString(),
     )
 
@@ -96,8 +94,6 @@ async function seedUser() {
 }
 
 seedUser().catch(() => {
-  console.error(
-    "Could not seed the user. Check MongoDB and the connection settings.",
-  )
+  console.error('Could not seed the user. Check MongoDB and the connection settings.')
   process.exitCode = 1
 })

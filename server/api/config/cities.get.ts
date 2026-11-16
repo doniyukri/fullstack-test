@@ -1,6 +1,6 @@
-import { provinceIdSchema } from "#shared/regions"
-import { getCities } from "../../utils/regions.ts"
-import { requireUser } from "../../utils/session.ts"
+import { provinceIdSchema } from '#shared/regions'
+import { getCities } from '../../utils/regions.ts'
+import { requireUser } from '../../utils/session.ts'
 
 export default defineEventHandler(async (event) => {
   await requireUser(event)
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Pilih provinsi yang valid",
+      statusMessage: 'Pilih provinsi yang valid',
     })
   }
 

@@ -190,6 +190,12 @@ textarea {
 }
 .employee-form .form-field label {
   padding-top: 0.75rem;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.submit-row > .primary-button {
+  min-width: 7.5rem;
 }
 .employee-form small {
   display: block;

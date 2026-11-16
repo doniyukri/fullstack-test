@@ -1,13 +1,12 @@
-import { regionListSchema } from "#shared/regions"
+import { regionListSchema } from '#shared/regions'
 
-const sourceUrl =
-  "https://raw.githubusercontent.com/emsifa/api-wilayah-indonesia/gh-pages/v2"
+const sourceUrl = 'https://raw.githubusercontent.com/emsifa/api-wilayah-indonesia/gh-pages/v2'
 
 const fetchRegionList = defineCachedFunction(
   async (path: string) => {
     try {
       const response = await $fetch<unknown>(`${sourceUrl}/${path}`, {
-        responseType: "json",
+        responseType: 'json',
         timeout: 8000,
         retry: 0,
       })
@@ -18,32 +17,30 @@ const fetchRegionList = defineCachedFunction(
     } catch {
       throw createError({
         statusCode: 503,
-        statusMessage: "Data wilayah belum tersedia. Coba lagi",
+        statusMessage: 'Data wilayah belum tersedia. Coba lagi',
       })
     }
   },
   {
-    name: "region-list-v2",
+    name: 'region-list-v2',
     maxAge: 24 * 60 * 60,
     swr: false,
   },
 )
 
 export async function getProvinces() {
-  return fetchRegionList("provinces.json")
+  return fetchRegionList('provinces.json')
 }
 
 export async function getCities(provinceId: string) {
   const provinces = await getProvinces()
 
-  const provinceExists = provinces.some(
-    (province) => province.id === provinceId,
-  )
+  const provinceExists = provinces.some((province) => province.id === provinceId)
 
   if (!provinceExists) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Provinsi tidak tersedia",
+      statusMessage: 'Provinsi tidak tersedia',
     })
   }
 
@@ -59,7 +56,7 @@ export async function getDistricts(cityId: string) {
   if (!cityExists) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Kabupaten atau kota tidak tersedia",
+      statusMessage: 'Kabupaten atau kota tidak tersedia',
     })
   }
 

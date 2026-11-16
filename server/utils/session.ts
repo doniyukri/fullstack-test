@@ -1,26 +1,23 @@
-import { createHash, randomBytes } from "node:crypto"
-import type { H3Event } from "h3"
-import type { SessionRecord } from "../types/session.ts"
-import { getDatabase } from "./db.ts"
+import { createHash, randomBytes } from 'node:crypto'
+import type { H3Event } from 'h3'
+import type { SessionRecord } from '../types/session.ts'
+import { getDatabase } from './db.ts'
 
-const cookieName = "ec_submission_session"
+const cookieName = 'ec_submission_session'
 const sessionLifetimeSeconds = 8 * 60 * 60
 const tokenPattern = /^[a-f0-9]{64}$/
 
 export function generateSessionToken(): string {
-  return randomBytes(32).toString("hex")
+  return randomBytes(32).toString('hex')
 }
 
 export function hashSessionToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex")
+  return createHash('sha256').update(token).digest('hex')
 }
 
-export async function createSession(
-  event: H3Event,
-  user: { id: string; username: string },
-) {
+export async function createSession(event: H3Event, user: { id: string; username: string }) {
   const db = await getDatabase()
-  const sessions = db.collection<SessionRecord>("sessions")
+  const sessions = db.collection<SessionRecord>('sessions')
   const token = generateSessionToken()
 
   await sessions.insertOne({
@@ -41,8 +38,8 @@ export async function createSession(
   setCookie(event, cookieName, token, {
     httpOnly: true,
     secure: !import.meta.dev,
-    sameSite: "strict",
-    path: "/",
+    sameSite: 'strict',
+    path: '/',
     maxAge: sessionLifetimeSeconds,
   })
 }
@@ -53,13 +50,13 @@ export async function requireUser(event: H3Event) {
   if (!token || !tokenPattern.test(token)) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Silakan masuk kembali.",
+      statusMessage: 'Silakan masuk kembali.',
     })
   }
 
   const db = await getDatabase()
 
-  const session = await db.collection<SessionRecord>("sessions").findOne({
+  const session = await db.collection<SessionRecord>('sessions').findOne({
     _id: hashSessionToken(token),
     expiresAt: { $gt: new Date() },
   })
@@ -67,7 +64,7 @@ export async function requireUser(event: H3Event) {
   if (!session) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Sesi berakhir. Silakan masuk kembali.",
+      statusMessage: 'Sesi berakhir. Silakan masuk kembali.',
     })
   }
 
@@ -83,10 +80,10 @@ export async function endSession(event: H3Event) {
   if (token && tokenPattern.test(token)) {
     const db = await getDatabase()
 
-    await db.collection<SessionRecord>("sessions").deleteOne({
+    await db.collection<SessionRecord>('sessions').deleteOne({
       _id: hashSessionToken(token),
     })
   }
 
-  deleteCookie(event, cookieName, { path: "/" })
+  deleteCookie(event, cookieName, { path: '/' })
 }

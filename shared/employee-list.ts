@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { cityIdSchema, districtIdSchema, provinceIdSchema } from "./regions.ts"
+import { z } from 'zod'
+import { cityIdSchema, districtIdSchema, provinceIdSchema } from './regions.ts'
 
 const ageSchema = z
   .string()
@@ -19,40 +19,31 @@ export const employeeListQuerySchema = z
     cursor: z.string().min(1).max(256).optional(),
   })
   .superRefine((query, context) => {
-    if (
-      query.minAge !== undefined &&
-      query.maxAge !== undefined &&
-      query.minAge > query.maxAge
-    ) {
+    if (query.minAge !== undefined && query.maxAge !== undefined && query.minAge > query.maxAge) {
       context.addIssue({
-        code: "custom",
-        path: ["maxAge"],
-        message: "Umur maksimum harus sama atau lebih besar dari umur minimum",
+        code: 'custom',
+        path: ['maxAge'],
+        message: 'Umur maksimum harus sama atau lebih besar dari umur minimum',
       })
     }
 
-    if (
-      query.provinceId &&
-      query.cityId &&
-      !query.cityId.startsWith(`${query.provinceId}.`)
-    ) {
+    if (query.provinceId && query.cityId && !query.cityId.startsWith(`${query.provinceId}.`)) {
       context.addIssue({
-        code: "custom",
-        path: ["cityId"],
-        message: "Kabupaten atau kota tidak sesuai dengan provinsi",
+        code: 'custom',
+        path: ['cityId'],
+        message: 'Kabupaten atau kota tidak sesuai dengan provinsi',
       })
     }
 
     if (
       query.districtId &&
       ((query.cityId && !query.districtId.startsWith(`${query.cityId}.`)) ||
-        (query.provinceId &&
-          !query.districtId.startsWith(`${query.provinceId}.`)))
+        (query.provinceId && !query.districtId.startsWith(`${query.provinceId}.`)))
     ) {
       context.addIssue({
-        code: "custom",
-        path: ["districtId"],
-        message: "Kecamatan tidak sesuai dengan wilayah yang dipilih",
+        code: 'custom',
+        path: ['districtId'],
+        message: 'Kecamatan tidak sesuai dengan wilayah yang dipilih',
       })
     }
   })

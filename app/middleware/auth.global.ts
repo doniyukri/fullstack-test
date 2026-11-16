@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   // The index page already redirects to /login
-  if (to.path === "/") {
+  if (to.path === '/') {
     return
   }
 
@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   let sessionExpired = false
 
   try {
-    await requestFetch("/api/auth/me", {
+    await requestFetch('/api/auth/me', {
       retry: 0,
 
       onResponseError({ response }) {
@@ -22,16 +22,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (!sessionExpired) {
       throw createError({
         statusCode: 503,
-        statusMessage: "Tidak dapat memeriksa sesi. Coba lagi.",
+        statusMessage: 'Tidak dapat memeriksa sesi. Coba lagi.',
       })
     }
   }
 
-  if (!signedIn && to.path !== "/login") {
-    return navigateTo("/login", { replace: true })
+  if (!signedIn && to.path !== '/login') {
+    return navigateTo('/login', { replace: true })
   }
 
-  if (signedIn && to.path === "/login") {
-    return navigateTo("/home", { replace: true })
+  if (signedIn && to.path === '/login') {
+    return navigateTo('/home', { replace: true })
   }
 })

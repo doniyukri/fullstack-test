@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { cityIdSchema, districtIdSchema, provinceIdSchema } from "./regions.ts"
+import { z } from 'zod'
+import { cityIdSchema, districtIdSchema, provinceIdSchema } from './regions.ts'
 
 export interface EmployeeGrade {
   id: string
@@ -8,16 +8,10 @@ export interface EmployeeGrade {
   maxSalary: number | null
 }
 
-export function createEmployeeSchema(
-  grades: readonly EmployeeGrade[],
-  today: string,
-) {
+export function createEmployeeSchema(grades: readonly EmployeeGrade[], today: string) {
   const birthDateSchema = z.iso
     .date()
-    .refine(
-      (value) => value <= today,
-      "Tanggal lahir tidak boleh melewati hari ini",
-    )
+    .refine((value) => value <= today, 'Tanggal lahir tidak boleh melewati hari ini')
 
   return z
     .strictObject({
@@ -36,9 +30,9 @@ export function createEmployeeSchema(
 
       if (!grade) {
         context.addIssue({
-          code: "custom",
-          path: ["gradeId"],
-          message: "Pilih golongan yang tersedia",
+          code: 'custom',
+          path: ['gradeId'],
+          message: 'Pilih golongan yang tersedia',
         })
 
         return
@@ -46,14 +40,13 @@ export function createEmployeeSchema(
 
       const belowMinimum = employee.baseSalary < grade.minSalary
 
-      const aboveMaximum =
-        grade.maxSalary !== null && employee.baseSalary > grade.maxSalary
+      const aboveMaximum = grade.maxSalary !== null && employee.baseSalary > grade.maxSalary
 
       if (belowMinimum || aboveMaximum) {
         context.addIssue({
-          code: "custom",
-          path: ["baseSalary"],
-          message: "Gaji pokok tidak sesuai dengan golongan",
+          code: 'custom',
+          path: ['baseSalary'],
+          message: 'Gaji pokok tidak sesuai dengan golongan',
         })
       }
     })
