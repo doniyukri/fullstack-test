@@ -16,18 +16,18 @@ test("an incorrect password is rejected", async () => {
   )
 })
 
-test("equal passwords receive different salted hashes", async () => {
+test("same password gives different hashes", async () => {
   const anotherHash = await hashPassword(testPassword)
 
   assert.notEqual(anotherHash, storedHash)
   assert.equal(await verifyPassword(testPassword, anotherHash), true)
 })
 
-test("a missing account cannot authenticate", async () => {
+test("password check fails when the hash is missing", async () => {
   assert.equal(await verifyPassword(testPassword), false)
 })
 
-test("malformed stored hashes are rejected safely", async () => {
+test("invalid saved hashes return false", async () => {
   for (const hash of ["", "broken", "scrypt-v1:bad:bad"]) {
     assert.equal(await verifyPassword(testPassword, hash), false)
   }

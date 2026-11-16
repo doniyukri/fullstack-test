@@ -3,7 +3,7 @@
     <AppHeader />
 
     <main class="page">
-      <!-- input -->
+      <!-- Login form -->
     </main>
   </div>
 </template>

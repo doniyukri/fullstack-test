@@ -36,13 +36,13 @@ test("STAR rejects invalid counts and unexpected fields", () => {
   }
 })
 
-test("Terbilang accepts an unformatted digit string", () => {
+test("Terbilang accepts digits as text", () => {
   const input = { amount: "1375" }
 
   assert.deepEqual(terbilangInputSchema.parse(input), input)
 })
 
-test("Terbilang rejects noncanonical amounts", () => {
+test("Terbilang rejects invalid amount formats", () => {
   for (const amount of ["1,375", "01", "-1", "1.5", 1375, null]) {
     const result = terbilangInputSchema.safeParse({ amount })
 

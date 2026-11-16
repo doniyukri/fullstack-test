@@ -20,13 +20,13 @@ test("type 3 centers the rows", () => {
   assert.deepEqual(actual, ["  *", " * *", "* * *"])
 })
 
-test("one star produces the same result for every type", () => {
+test("count 1 gives one star for all types", () => {
   for (const type of [1, 2, 3]) {
     assert.deepEqual(buildStarRows(1, type), ["*"])
   }
 })
 
-test("five stars produces five rows with a complete final row", () => {
+test("count 5 gives five rows ending with five stars", () => {
   for (const type of [1, 2, 3]) {
     const rows = buildStarRows(5, type)
 

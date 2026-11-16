@@ -6,7 +6,7 @@ import {
   terbilang,
 } from "../shared/terbilang.ts"
 
-const examples = [
+const smallNumberCases = [
   [0, "nol"],
   [1, "satu"],
   [9, "sembilan"],
@@ -17,19 +17,19 @@ const examples = [
   [19, "sembilan belas"],
 ]
 
-for (const [value, expected] of examples) {
+for (const [value, expected] of smallNumberCases) {
   test(`${value} becomes "${expected}"`, () => {
     assert.equal(spellUnderTwenty(value), expected)
   })
 }
 
-test("the small-number helper rejects unsupported values", () => {
+test("spellUnderTwenty rejects invalid input", () => {
   for (const value of [-1, 20, 1.5, NaN, Infinity, "1", null]) {
     assert.throws(() => spellUnderTwenty(value), RangeError)
   }
 })
 
-const largerExamples = [
+const underThousandCases = [
   [0, "nol"],
   [19, "sembilan belas"],
   [20, "dua puluh"],
@@ -44,13 +44,13 @@ const largerExamples = [
   [999, "sembilan ratus sembilan puluh sembilan"],
 ]
 
-for (const [value, expected] of largerExamples) {
-  test(`${value} is spelled correctly below one thousand`, () => {
+for (const [value, expected] of underThousandCases) {
+  test(`spellUnderThousand(${value}) gives "${expected}"`, () => {
     assert.equal(spellUnderThousand(value), expected)
   })
 }
 
-test("the hundreds helper rejects unsupported values", () => {
+test("spellUnderThousand rejects invalid input", () => {
   for (const value of [-1, 1000, 1.5, NaN, Infinity, "100", null]) {
     assert.throws(() => spellUnderThousand(value), RangeError)
   }
