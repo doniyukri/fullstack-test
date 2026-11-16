@@ -51,7 +51,7 @@ export async function verifyCaptcha(token: string): Promise<void> {
     })
   }
 
-  // Test keys return a fixed hostname and do not include an action.
+  // Test keys return a fixed hostname and do not include an action
   if (!usesTestSecret) {
     const expectedHostname = new URL(config.siteOrigin).hostname
 

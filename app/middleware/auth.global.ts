@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  // The index page already redirects to /login.
+  // The index page already redirects to /login
   if (to.path === "/") {
     return
   }

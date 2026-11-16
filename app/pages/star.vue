@@ -87,7 +87,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
       },
     })
 
-    // Keep the accepted version even if the following read fail
+    // Keep the saved version if loading output fails
     version.value = result.version
     savedInput.value = input
 

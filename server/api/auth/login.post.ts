@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   const db = await getDatabase()
   const limits = db.collection<RateLimitRecord>("limits")
 
-  // Use the connection IP instead of trusting a client-supplied header.
+  // Use the connection IP instead of trusting a client-supplied header
   const ip = getRequestIP(event, { xForwardedFor: false }) ?? "unknown"
 
   const ipLimit = await recordAttempt(limits, `login-ip:${ip}`, ipWindowMs)
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
     username,
   })
 
-  // The helper also performs password hashing when the user is missing.
+  // The helper also performs password hashing when the user is missing
   const passwordMatches = await verifyPassword(password, user?.passwordHash)
 
   if (!user || !passwordMatches) {

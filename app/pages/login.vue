@@ -51,7 +51,7 @@ async function submitLogin() {
     password.value = ''
     captcha.value = ''
 
-    // A token may already have been used by the server.
+    // A token may already have been used by the server
     captchaKey.value += 1
 
     return
