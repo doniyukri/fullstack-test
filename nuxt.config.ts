@@ -7,6 +7,8 @@ export default defineNuxtConfig({
     mongoUrl: '',
     mongoDatabase: 'electronic_city_submission',
     elasticsearchUrl: 'http://127.0.0.1:9201',
+    elasticsearchAuthorization: '',
+    elasticsearchServerless: false,
     elasticsearchIndex: 'eci-activity',
     siteOrigin: 'http://localhost:3001',
     turnstileSecret: '',

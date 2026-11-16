@@ -6,11 +6,19 @@ import { getDatabase } from './db.ts'
 let syncing: Promise<void> | undefined
 let indexReady = false
 
+function elasticHeaders(contentType: string): Record<string, string> {
+  const authorization = useRuntimeConfig().elasticsearchAuthorization
+  return {
+    'Content-Type': contentType,
+    ...(authorization ? { Authorization: authorization } : {}),
+  }
+}
+
 async function elasticRequest(path: string, method: 'GET' | 'PUT' | 'POST', body?: unknown) {
   const config = useRuntimeConfig()
   const response = await fetch(`${config.elasticsearchUrl}/${path}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: elasticHeaders('application/json'),
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(5000),
   })
@@ -27,7 +35,9 @@ async function ensureIndex() {
   } catch {
     try {
       await elasticRequest(index, 'PUT', {
-        settings: { number_of_shards: 1, number_of_replicas: 0 },
+        ...(String(useRuntimeConfig().elasticsearchServerless) === 'true'
+          ? {}
+          : { settings: { number_of_shards: 1, number_of_replicas: 0 } }),
         mappings: {
           properties: {
             id: { type: 'keyword' },
@@ -74,7 +84,7 @@ export function syncActivity(userId?: string): Promise<void> {
 
     const response = await fetch(`${useRuntimeConfig().elasticsearchUrl}/_bulk?refresh=wait_for`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-ndjson' },
+      headers: elasticHeaders('application/x-ndjson'),
       body: lines,
       signal: AbortSignal.timeout(8000),
     })
