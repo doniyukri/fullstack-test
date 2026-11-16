@@ -42,9 +42,11 @@ async function seedUser() {
 
     await users.createIndex({ username: 1 }, { unique: true })
 
-    await db
-      .collection("sessions")
-      .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+    for (const collectionName of ["sessions", "limits"]) {
+      await db
+        .collection(collectionName)
+        .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+    }
 
     const passwordHash = await hashPassword(credentials.password)
 
