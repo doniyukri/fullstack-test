@@ -1,15 +1,18 @@
-import { createEmployeeSchema } from "#shared/employee"
-import { employeeGrades } from "../config/employee-grades.ts"
-import type { EmployeeRecord } from "../types/employee.ts"
-import { getTodayInJakarta } from "../utils/date.ts"
-import { getDatabase } from "../utils/db.ts"
-import { resolveEmployeeRegions } from "../utils/employee-regions.ts"
-import { getCities, getDistricts, getProvinces } from "../utils/regions.ts"
-import { requireUser } from "../utils/session.ts"
+import { readJsonBody } from '../utils/request-body.ts'
+import { createEmployeeSchema } from '#shared/employee'
+import { employeeGrades } from '../config/employee-grades.ts'
+import type { EmployeeRecord } from '../types/employee.ts'
+import { getTodayInJakarta } from '../utils/date.ts'
+import { getDatabase } from '../utils/db.ts'
+import { resolveEmployeeRegions } from '../utils/employee-regions.ts'
+import { getCities, getDistricts, getProvinces } from '../utils/regions.ts'
+import { requireUser } from '../utils/session.ts'
+import { auditTransaction } from '../utils/audit.ts'
+import { getActivityChanges } from '#shared/activity'
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event)
-  const body = await readBody(event)
+  const body = await readJsonBody(event)
 
   const now = new Date()
 
@@ -20,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Periksa data karyawan",
+      statusMessage: 'Periksa data karyawan',
       data: {
         issues: parsed.error.issues,
       },
@@ -55,7 +58,7 @@ export default defineEventHandler(async (event) => {
   if (!grade) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Golongan tidak tersedia",
+      statusMessage: 'Golongan tidak tersedia',
     })
   }
 
@@ -71,13 +74,25 @@ export default defineEventHandler(async (event) => {
 
   const db = await getDatabase()
 
-  const result = await db
-    .collection<EmployeeRecord>("employees")
-    .insertOne(employee)
-
-  setResponseStatus(event, 201)
-
-  return {
-    id: result.insertedId.toHexString(),
-  }
+  return auditTransaction(user, 'Form Karyawan', 'save', async (session) => {
+    const result = await db.collection<EmployeeRecord>('employees').insertOne(employee, { session })
+    setResponseStatus(event, 201)
+    return {
+      result: { id: result.insertedId.toHexString() },
+      changes: getActivityChanges(
+        {},
+        {
+          Nama: input.name,
+          Jabatan: input.position,
+          Golongan: grade.name,
+          Provinsi: regions.province.name,
+          'Kabupaten/kota': regions.city.name,
+          Kecamatan: regions.district.name,
+          'Gaji pokok': '[disembunyikan]',
+          'Tanggal lahir': '[disembunyikan]',
+          Alamat: '[disembunyikan]',
+        },
+      ),
+    }
+  })
 })

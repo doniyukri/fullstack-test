@@ -6,6 +6,12 @@ interface StarInput {
   type: StarType
 }
 
+const { showToast } = useToast()
+const ready = ref(false)
+onMounted(() => {
+  ready.value = true
+})
+
 const options = [
   { value: 1, label: 'Tipe 1 (rata kiri)' },
   { value: 2, label: 'Tipe 2 (rata kanan)' },
@@ -29,9 +35,7 @@ const count = ref(record ? String(record.count) : '')
 const type = ref<StarType | null>(record?.type ?? null)
 const version = ref(record?.version ?? 0)
 
-const savedInput = ref<StarInput | null>(
-  record ? { count: record.count, type: record.type } : null,
-)
+const savedInput = ref<StarInput | null>(record ? { count: record.count, type: record.type } : null)
 
 const saving = ref(false)
 const errorMessage = ref('')
@@ -45,10 +49,7 @@ const hasChanges = computed(() => {
     return count.value !== '' || type.value !== null
   }
 
-  return (
-    count.value !== String(savedInput.value.count) ||
-    type.value !== savedInput.value.type
-  )
+  return count.value !== String(savedInput.value.count) || type.value !== savedInput.value.type
 })
 
 async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
@@ -69,6 +70,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
   }
 
   saving.value = true
+  let warning = false
 
   try {
     const result = await $fetch('/api/star', {
@@ -81,9 +83,16 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
       },
 
       onResponseError({ response }) {
+        if (response.status === 429) {
+          showToast(
+            response._data?.statusMessage || 'Tunggu sebelum mengirim data yang sama',
+            'warning',
+          )
+          warning = true
+          return
+        }
         errorMessage.value =
-          response._data?.statusMessage ||
-          'Tidak dapat menyimpan data. Coba lagi.'
+          response._data?.statusMessage || 'Tidak dapat menyimpan data. Coba lagi.'
       },
     })
 
@@ -94,13 +103,13 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
     await refresh()
 
     if (error.value) {
-      errorMessage.value =
-        'Data tersimpan, tetapi output belum dapat dimuat. Muat ulang halaman.'
+      errorMessage.value = 'Data tersimpan, tetapi output belum dapat dimuat. Muat ulang halaman.'
       return false
     }
 
     return true
   } catch {
+    if (warning) return false
     if (!errorMessage.value) {
       errorMessage.value = 'Tidak dapat terhubung. Coba lagi.'
     }
@@ -156,7 +165,7 @@ onBeforeRouteLeave((to) => {
 
     <main class="page star-page">
       <form class="panel" @submit.prevent="submitStar">
-        <fieldset class="star-fields" :disabled="saving">
+        <fieldset class="star-fields" :disabled="saving || !ready">
           <div class="submit-row">
             <div class="form-field">
               <label for="star-count">Jumlah bintang</label>
@@ -172,7 +181,7 @@ onBeforeRouteLeave((to) => {
                 maxlength="1"
                 aria-describedby="star-count-help"
                 required
-              >
+              />
             </div>
 
             <button class="primary-button" type="submit">
@@ -180,25 +189,13 @@ onBeforeRouteLeave((to) => {
             </button>
           </div>
 
-          <p id="star-count-help" class="field-help">
-            Masukkan satu angka dari 1 sampai 5.
-          </p>
+          <p id="star-count-help" class="field-help">Masukkan satu angka dari 1 sampai 5.</p>
 
           <fieldset class="type-options">
             <legend>Tipe susunan</legend>
 
-            <label
-              v-for="option in options"
-              :key="option.value"
-              class="radio-option"
-            >
-              <input
-                v-model="type"
-                type="radio"
-                name="star-type"
-                :value="option.value"
-                required
-              >
+            <label v-for="option in options" :key="option.value" class="radio-option">
+              <input v-model="type" type="radio" name="star-type" :value="option.value" required />
 
               <span>{{ option.label }}</span>
             </label>
@@ -206,11 +203,7 @@ onBeforeRouteLeave((to) => {
         </fieldset>
       </form>
 
-      <p
-        v-if="errorMessage && !confirmOpen"
-        class="form-error"
-        role="alert"
-      >
+      <p v-if="errorMessage && !confirmOpen" class="form-error" role="alert">
         {{ errorMessage }}
       </p>
 
@@ -232,7 +225,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="primary-button"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="navigateTo('/home')"
         >
           Save &amp; kembali
@@ -256,7 +249,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="secondary-button dialog-action"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="discardAndLeave"
         >
           Buang
@@ -265,7 +258,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="primary-button dialog-action"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="saveAndLeave"
         >
           {{ saving ? 'Menyimpan…' : 'Simpan' }}

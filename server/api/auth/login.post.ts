@@ -1,16 +1,13 @@
-import type { H3Event } from "h3"
-import { loginSchema } from "../../../shared/login-input.ts"
-import type { UserRecord } from "../../types/user.ts"
-import { verifyCaptcha } from "../../utils/captcha.ts"
-import { getDatabase } from "../../utils/db.ts"
-import { verifyPassword } from "../../utils/password.ts"
-import {
-  clearRateLimit,
-  getRateLimit,
-  recordAttempt,
-} from "../../utils/rate-limit.ts"
-import type { RateLimitRecord } from "../../utils/rate-limit.ts"
-import { createSession } from "../../utils/session.ts"
+import { readJsonBody } from '../../utils/request-body.ts'
+import type { H3Event } from 'h3'
+import { loginSchema } from '../../../shared/login-input.ts'
+import type { UserRecord } from '../../types/user.ts'
+import { verifyCaptcha } from '../../utils/captcha.ts'
+import { getDatabase } from '../../utils/db.ts'
+import { verifyPassword } from '../../utils/password.ts'
+import { clearRateLimit, getRateLimit, recordAttempt } from '../../utils/rate-limit.ts'
+import type { RateLimitRecord } from '../../utils/rate-limit.ts'
+import { createSession } from '../../utils/session.ts'
 
 const ipWindowMs = 60 * 1000
 const ipRequestLimit = 20
@@ -19,7 +16,7 @@ const accountWindowMs = 15 * 60 * 1000
 const accountFailureLimit = 10
 
 function rejectRateLimit(event: H3Event, retryAfter: number): never {
-  setHeader(event, "Retry-After", String(retryAfter))
+  setHeader(event, 'Retry-After', retryAfter)
 
   throw createError({
     statusCode: 429,
@@ -29,10 +26,10 @@ function rejectRateLimit(event: H3Event, retryAfter: number): never {
 
 export default defineEventHandler(async (event) => {
   const db = await getDatabase()
-  const limits = db.collection<RateLimitRecord>("limits")
+  const limits = db.collection<RateLimitRecord>('limits')
 
   // Use the connection IP instead of trusting a client-supplied header
-  const ip = getRequestIP(event, { xForwardedFor: false }) ?? "unknown"
+  const ip = getRequestIP(event, { xForwardedFor: false }) ?? 'unknown'
 
   const ipLimit = await recordAttempt(limits, `login-ip:${ip}`, ipWindowMs)
 
@@ -40,13 +37,13 @@ export default defineEventHandler(async (event) => {
     rejectRateLimit(event, ipLimit.retryAfter)
   }
 
-  const body = await readBody(event)
+  const body = await readJsonBody(event)
   const parsed = loginSchema.safeParse(body)
 
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Periksa username, password, dan CAPTCHA.",
+      statusMessage: 'Periksa username, password, dan CAPTCHA.',
     })
   }
 
@@ -62,7 +59,7 @@ export default defineEventHandler(async (event) => {
     rejectRateLimit(event, accountLimit.retryAfter)
   }
 
-  const user = await db.collection<UserRecord>("users").findOne({
+  const user = await db.collection<UserRecord>('users').findOne({
     username,
   })
 
@@ -74,7 +71,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 401,
-      statusMessage: "Username atau password salah.",
+      statusMessage: 'Username atau password salah.',
     })
   }
 

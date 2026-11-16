@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { terbilangInputSchema } from '#shared/calculator-inputs'
 
+const ready = ref(false)
+onMounted(() => {
+  ready.value = true
+})
+
 const { data, error, refresh } = await useFetch('/api/terbilang', {
   retry: 0,
 })
@@ -26,56 +31,6 @@ let destination = '/home'
 let allowLeave = false
 
 const hasChanges = computed(() => amount.value !== savedAmount.value)
-
-function formatAmount(value: string): string {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
-function updateAmount(event: Event) {
-  const input = event.target
-
-  if (!(input instanceof HTMLInputElement)) {
-    return
-  }
-
-  const cursor = input.selectionStart ?? input.value.length
-  const digitsBeforeCursor = input.value
-    .slice(0, cursor)
-    .replaceAll(',', '').length
-
-  const digits = input.value.replaceAll(',', '')
-
-  if (!/^[0-9,]*$/.test(input.value) || digits.length > 15) {
-    input.value = formatAmount(amount.value)
-    errorMessage.value = 'Gunakan angka saja, maksimal 15 digit.'
-    return
-  }
-
-  // Keep one zero and remove extra leading zeros
-  const normalized = digits.replace(/^0+(?=\d)/, '')
-  const removedZeros = digits.length - normalized.length
-
-  amount.value = normalized
-  errorMessage.value = ''
-
-  const formatted = formatAmount(normalized)
-  input.value = formatted
-
-  // Count digits to keep the cursor position
-  const targetDigits = Math.max(0, digitsBeforeCursor - removedZeros)
-  let position = 0
-  let passedDigits = 0
-
-  while (position < formatted.length && passedDigits < targetDigits) {
-    if (formatted[position] !== ',') {
-      passedDigits += 1
-    }
-
-    position += 1
-  }
-
-  input.setSelectionRange(position, position)
-}
 
 async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
   if (saving.value) {
@@ -109,8 +64,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
 
       onResponseError({ response }) {
         errorMessage.value =
-          response._data?.statusMessage ||
-          'Tidak dapat menyimpan data. Coba lagi.'
+          response._data?.statusMessage || 'Tidak dapat menyimpan data. Coba lagi.'
       },
     })
 
@@ -121,8 +75,7 @@ async function saveInput(action: 'submit' | 'save'): Promise<boolean> {
     await refresh()
 
     if (error.value) {
-      errorMessage.value =
-        'Data tersimpan, tetapi output belum dapat dimuat. Muat ulang halaman.'
+      errorMessage.value = 'Data tersimpan, tetapi output belum dapat dimuat. Muat ulang halaman.'
       return false
     }
 
@@ -183,23 +136,19 @@ onBeforeRouteLeave((to) => {
 
     <main class="page terbilang-page">
       <form class="panel" @submit.prevent="submitTerbilang">
-        <fieldset class="amount-fields" :disabled="saving">
+        <fieldset class="amount-fields" :disabled="saving || !ready">
           <div class="submit-row">
             <div class="form-field">
               <label for="amount">Nominal (Rp)</label>
 
-              <input
+              <NumberInput
                 id="amount"
-                :value="formatAmount(amount)"
-                class="text-input"
+                v-model="amount"
                 name="amount"
-                type="text"
-                inputmode="numeric"
                 autocomplete="off"
                 aria-describedby="amount-help"
                 required
-                @input="updateAmount"
-              >
+              />
             </div>
 
             <button class="primary-button" type="submit">
@@ -207,28 +156,18 @@ onBeforeRouteLeave((to) => {
             </button>
           </div>
 
-          <p id="amount-help" class="field-help">
-            Maksimal 15 digit.
-          </p>
+          <p id="amount-help" class="field-help">Maksimal 15 digit.</p>
         </fieldset>
       </form>
 
-      <p
-        v-if="errorMessage && !confirmOpen"
-        class="form-error"
-        role="alert"
-      >
+      <p v-if="errorMessage && !confirmOpen" class="form-error" role="alert">
         {{ errorMessage }}
       </p>
 
       <section class="panel" aria-labelledby="terbilang-title">
         <h2 id="terbilang-title">Terbilang</h2>
 
-        <p
-          v-if="data?.record"
-          class="terbilang-output"
-          aria-live="polite"
-        >
+        <p v-if="data?.record" class="terbilang-output" aria-live="polite">
           "{{ data.record.text }}"
         </p>
 
@@ -239,7 +178,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="primary-button"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="navigateTo('/home')"
         >
           Save &amp; kembali
@@ -263,7 +202,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="secondary-button dialog-action"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="discardAndLeave"
         >
           Buang
@@ -272,7 +211,7 @@ onBeforeRouteLeave((to) => {
         <button
           class="primary-button dialog-action"
           type="button"
-          :disabled="saving"
+          :disabled="saving || !ready"
           @click="saveAndLeave"
         >
           {{ saving ? 'Menyimpan…' : 'Simpan' }}

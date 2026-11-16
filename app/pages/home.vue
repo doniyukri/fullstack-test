@@ -43,10 +43,7 @@ async function logout() {
         <NuxtLink class="feature-link" to="/form-input">Form Input</NuxtLink>
       </nav>
 
-      <section aria-labelledby="history-title">
-        <h2 id="history-title">Log History</h2>
-        <p>Belum ada aktivitas.</p>
-      </section>
+      <ActivityHistory />
     </main>
     <AppDialog
       v-if="logoutOpen"

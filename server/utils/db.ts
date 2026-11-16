@@ -1,14 +1,14 @@
-import { MongoClient } from "mongodb"
+import { MongoClient } from 'mongodb'
 
 let clientPromise: Promise<MongoClient> | undefined
 
-export async function getDatabase() {
+export async function getMongoClient() {
   const config = useRuntimeConfig()
 
   if (!config.mongoUrl) {
     throw createError({
       statusCode: 503,
-      statusMessage: "Database belum dikonfigurasi.",
+      statusMessage: 'Database belum dikonfigurasi.',
     })
   }
 
@@ -23,6 +23,10 @@ export async function getDatabase() {
     })
   }
 
-  const client = await clientPromise
-  return client.db(config.mongoDatabase)
+  return clientPromise
+}
+
+export async function getDatabase() {
+  const client = await getMongoClient()
+  return client.db(useRuntimeConfig().mongoDatabase)
 }

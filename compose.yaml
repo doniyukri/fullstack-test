@@ -3,15 +3,44 @@ name: electronic-city-submission
 services:
   mongo:
     image: mongo:8.0
+    command: ['mongod', '--replSet', 'rs0', '--bind_ip_all']
     ports:
-      - "127.0.0.1:27018:27017"
+      - '127.0.0.1:27018:27017'
     volumes:
       - mongo-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--quiet',
+          '--eval',
+          "try { rs.status(); quit(db.hello().isWritablePrimary ? 0 : 1) } catch { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}); quit(1) }",
+        ]
       interval: 5s
       timeout: 5s
       retries: 20
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.0
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    ports:
+      - '127.0.0.1:9201:9200'
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "curl -fsS 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
 volumes:
   mongo-data:
+  elastic-data:
