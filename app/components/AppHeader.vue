@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { ArrowLeft } from '@lucide/vue'
+import { ArrowLeft, LogOut } from '@lucide/vue'
 
 defineProps<{
   title?: string
   backTo?: string
+  showLogout?: boolean
+}>()
+
+const emit = defineEmits<{
+  logout: []
 }>()
 </script>
 
@@ -21,6 +26,16 @@ defineProps<{
 
       <h1 v-if="title">{{ title }}</h1>
       <span v-else class="brand">Electronic City</span>
+
+      <button
+        v-if="showLogout"
+        class="icon-button logout-button"
+        type="button"
+        aria-label="Keluar"
+        @click="emit('logout')"
+      >
+        <LogOut :size="24" aria-hidden="true" />
+      </button>
     </div>
   </header>
 </template>
@@ -63,5 +78,10 @@ h1 {
 
 .back-link:hover {
   background: #eaf4fc;
+}
+
+.logout-button {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 </style>
