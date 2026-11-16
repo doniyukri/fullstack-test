@@ -21,6 +21,7 @@ export async function resolveEmployeeRegions(selection: RegionSelection, source:
     }
   }
 
+  // The city must belong to the selected province
   const cities = await source.getCities(province.id)
   const city = cities.find((item) => item.id === selection.cityId)
 

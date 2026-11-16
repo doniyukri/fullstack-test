@@ -20,6 +20,7 @@ export async function createSession(event: H3Event, user: { id: string; username
   const sessions = db.collection<SessionRecord>('sessions')
   const token = generateSessionToken()
 
+  // Keep the token hash in MongoDB, not the login token
   await sessions.insertOne({
     _id: hashSessionToken(token),
     userId: user.id,
@@ -27,6 +28,7 @@ export async function createSession(event: H3Event, user: { id: string; username
     expiresAt: new Date(Date.now() + sessionLifetimeSeconds * 1000),
   })
 
+  // Remove the old session after login
   const previousToken = getCookie(event, cookieName)
 
   if (previousToken && tokenPattern.test(previousToken)) {

@@ -17,6 +17,7 @@ export async function readJsonBody(event: H3Event): Promise<unknown> {
     while (true) {
       const chunk = await reader.read()
       if (chunk.done) break
+      // Check the real size too, not only Content-Length
       size += chunk.value.byteLength
       if (size > maxBodySize) {
         await reader.cancel()

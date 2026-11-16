@@ -12,12 +12,14 @@ export async function getMongoClient() {
     })
   }
 
+  // Reuse the connection while it is still loading
   if (!clientPromise) {
     const client = new MongoClient(config.mongoUrl, {
       serverSelectionTimeoutMS: 5000,
     })
 
     clientPromise = client.connect().catch((error) => {
+      // Allow the next request to connect again
       clientPromise = undefined
       throw error
     })

@@ -48,6 +48,7 @@ export async function getCities(provinceId: string) {
 }
 
 export async function getDistricts(cityId: string) {
+  // The city ID starts with the province ID
   const provinceId = cityId.slice(0, 2)
   const cities = await getCities(provinceId)
 

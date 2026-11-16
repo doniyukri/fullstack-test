@@ -74,6 +74,7 @@ export default defineEventHandler(async (event) => {
         throw error
       }
     } else {
+      // Do not replace newer data saved from another tab
       const result = await collection.replaceOne(
         {
           _id: user.id,

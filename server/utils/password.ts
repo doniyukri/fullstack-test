@@ -30,6 +30,7 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 export async function verifyPassword(password: string, storedHash?: string): Promise<boolean> {
+  // Run scrypt even when the username is not found
   const parts = (storedHash || dummyHash).split(':')
 
   if (parts.length !== 3) {
