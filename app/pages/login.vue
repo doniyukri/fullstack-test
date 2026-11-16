@@ -2,6 +2,11 @@
 import { Eye, EyeOff } from '@lucide/vue'
 import { loginSchema } from '#shared/login-input'
 
+const ready = ref(false)
+onMounted(() => {
+  ready.value = true
+})
+
 const username = ref('')
 const password = ref('')
 const captcha = ref('')
@@ -38,9 +43,7 @@ async function submitLogin() {
       retry: 0,
 
       onResponseError({ response }) {
-        errorMessage.value =
-          response._data?.statusMessage ||
-          'Tidak dapat masuk. Coba lagi.'
+        errorMessage.value = response._data?.statusMessage || 'Tidak dapat masuk. Coba lagi.'
       },
     })
   } catch {
@@ -66,17 +69,13 @@ async function submitLogin() {
 
 <template>
   <div>
-    <AppHeader />
-
     <main class="page login-page">
       <section class="login-card" aria-labelledby="login-title">
-        <h1 id="login-title">Masuk</h1>
+        <h1 id="login-title" aria-label="Masuk ke eci.id">
+          <AppLogo size="login" />
+        </h1>
 
-        <form
-          class="login-form"
-          :aria-busy="submitting"
-          @submit.prevent="submitLogin"
-        >
+        <form class="login-form" :aria-busy="submitting" @submit.prevent="submitLogin">
           <div class="form-field">
             <label for="username">Username</label>
 
@@ -91,9 +90,9 @@ async function submitLogin() {
               :spellcheck="false"
               minlength="3"
               maxlength="80"
-              :disabled="submitting"
+              :disabled="submitting || !ready"
               required
-            >
+            />
           </div>
 
           <div class="form-field">
@@ -109,20 +108,16 @@ async function submitLogin() {
                 autocomplete="current-password"
                 minlength="12"
                 maxlength="128"
-                :disabled="submitting"
+                :disabled="submitting || !ready"
                 required
-              >
+              />
 
               <button
                 class="icon-button password-toggle"
                 type="button"
-                :aria-label="
-                  showPassword
-                    ? 'Sembunyikan password'
-                    : 'Tampilkan password'
-                "
+                :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
                 :aria-pressed="showPassword"
-                :disabled="submitting"
+                :disabled="submitting || !ready"
                 @click="showPassword = !showPassword"
               >
                 <EyeOff v-if="showPassword" :size="20" aria-hidden="true" />
@@ -131,20 +126,13 @@ async function submitLogin() {
             </div>
           </div>
 
-          <CaptchaWidget
-            :key="captchaKey"
-            v-model="captcha"
-          />
+          <CaptchaWidget :key="captchaKey" v-model="captcha" />
 
           <p v-if="errorMessage" class="form-error" role="alert">
             {{ errorMessage }}
           </p>
 
-          <button
-            class="primary-button"
-            type="submit"
-            :disabled="submitting || !captcha"
-          >
+          <button class="primary-button" type="submit" :disabled="submitting || !captcha || !ready">
             {{ submitting ? 'Memproses…' : 'Masuk' }}
           </button>
         </form>
@@ -170,6 +158,8 @@ async function submitLogin() {
 }
 
 h1 {
+  display: flex;
+  justify-content: center;
   margin: 0 0 1.5rem;
   font-size: 1.75rem;
 }

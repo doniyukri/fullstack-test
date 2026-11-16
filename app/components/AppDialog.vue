@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const dialog = ref<HTMLDialogElement | null>(null)
+const slots = useSlots()
 const titleId = useId()
 
 function requestClose() {
@@ -52,7 +53,7 @@ onBeforeUnmount(() => {
 
     <slot />
 
-    <div class="dialog-actions">
+    <div v-if="slots.actions" class="dialog-actions">
       <slot name="actions" />
     </div>
   </dialog>

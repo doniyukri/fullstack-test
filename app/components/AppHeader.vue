@@ -15,17 +15,12 @@ const emit = defineEmits<{
 <template>
   <header class="site-header">
     <div class="header-content">
-      <NuxtLink
-        v-if="backTo"
-        :to="backTo"
-        class="back-link"
-        aria-label="Kembali"
-      >
+      <NuxtLink v-if="backTo" :to="backTo" class="back-link" aria-label="Kembali">
         <ArrowLeft :size="24" aria-hidden="true" />
       </NuxtLink>
 
       <h1 v-if="title">{{ title }}</h1>
-      <span v-else class="brand">Electronic City</span>
+      <AppLogo v-else class="header-brand" />
 
       <button
         v-if="showLogout"
@@ -60,10 +55,8 @@ h1 {
   font-size: 1.5rem;
 }
 
-.brand {
-  color: var(--primary);
-  font-size: 1.25rem;
-  font-weight: 700;
+.header-brand {
+  flex-shrink: 0;
 }
 
 .back-link {
