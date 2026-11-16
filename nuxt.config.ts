@@ -7,5 +7,10 @@ export default defineNuxtConfig({
     mongoUrl: "",
     mongoDatabase: "electronic_city_submission",
     siteOrigin: "http://localhost:3001",
+    turnstileSecret: "",
+
+    public: {
+      turnstileSiteKey: "",
+    },
   },
 })
