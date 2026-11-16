@@ -62,3 +62,43 @@ export function spellUnderThousand(value: number): string {
 
   return prefix + " " + spellUnderThousand(remainder)
 }
+
+const unitNames = ["", "ribu", "juta", "miliar", "triliun"]
+
+export function terbilang(raw: string): string {
+  if (typeof raw !== "string" || !/^(0|[1-9]\d{0,14})$/.test(raw)) {
+    throw new RangeError("Masukkan bilangan bulat 0–999,999,999,999,999.")
+  }
+
+  let remaining = BigInt(raw)
+
+  if (remaining === 0n) {
+    return "Nol rupiah"
+  }
+
+  const groups: string[] = []
+  let unitIndex = 0
+
+  while (remaining > 0n) {
+    const groupValue = Number(remaining % 1000n)
+
+    if (groupValue > 0) {
+      let groupWords = spellUnderThousand(groupValue)
+
+      if (unitIndex === 1 && groupValue === 1) {
+        groupWords = "seribu"
+      } else if (unitIndex > 0) {
+        groupWords += " " + unitNames[unitIndex]!
+      }
+
+      groups.unshift(groupWords)
+    }
+
+    remaining = remaining / 1000n
+    unitIndex++
+  }
+
+  const phrase = groups.join(" ") + " rupiah"
+
+  return phrase.charAt(0).toUpperCase() + phrase.slice(1)
+}
