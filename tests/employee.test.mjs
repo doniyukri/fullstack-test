@@ -13,8 +13,8 @@ const validEmployee = {
   baseSalary: 4_000_000,
   address: "Jalan Melati 10",
   provinceId: "31",
-  cityId: "3171",
-  districtId: "3171010",
+  cityId: "31.71",
+  districtId: "31.71.01",
 }
 
 test("employee accepts valid data and trims text", () => {

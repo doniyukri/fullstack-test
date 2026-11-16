@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { cityIdSchema, districtIdSchema, provinceIdSchema } from "./regions.ts"
 
 export interface EmployeeGrade {
   id: string
@@ -26,9 +27,9 @@ export function createEmployeeSchema(
       birthDate: birthDateSchema,
       baseSalary: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
       address: z.string().trim().min(1).max(500),
-      provinceId: z.string().trim().min(1).max(32),
-      cityId: z.string().trim().min(1).max(32),
-      districtId: z.string().trim().min(1).max(32),
+      provinceId: provinceIdSchema,
+      cityId: cityIdSchema,
+      districtId: districtIdSchema,
     })
     .superRefine((employee, context) => {
       const grade = grades.find((item) => item.id === employee.gradeId)
