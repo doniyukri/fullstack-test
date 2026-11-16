@@ -25,3 +25,5 @@ export const regionListSchema = z.object({
     )
     .min(1),
 })
+
+export type Region = z.infer<typeof regionListSchema>["data"][number]

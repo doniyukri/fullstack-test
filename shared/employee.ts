@@ -58,3 +58,5 @@ export function createEmployeeSchema(
       }
     })
 }
+
+export type EmployeeInput = z.infer<ReturnType<typeof createEmployeeSchema>>
