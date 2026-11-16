@@ -48,6 +48,12 @@ async function seedUser() {
         .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
     }
 
+    await db.collection("employees").createIndex({
+      userId: 1,
+      createdAt: -1,
+      _id: -1,
+    })
+
     const passwordHash = await hashPassword(credentials.password)
 
     const result = await users.updateOne(
