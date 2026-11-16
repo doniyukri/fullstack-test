@@ -18,3 +18,8 @@ export const terbilangInputSchema = z.strictObject({
       "Masukkan bilangan bulat 0–999,999,999,999,999.",
     ),
 })
+
+export const terbilangSaveSchema = terbilangInputSchema.extend({
+  action: z.enum(["submit", "save"]),
+  version: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+})
